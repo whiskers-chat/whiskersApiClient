@@ -1,7 +1,7 @@
 # whiskersApiClient
 An API client for meower
 ## Running tests
-Before running tests, create a Dotenv file with a valid username and password, as shown below.
+Before running tests, create a Dotenv file with a valid username and password, as shown below. Github actions uses the account `whiskersGhAcTestRun` to run tests.
 ```Dotenv
 MEOWERTESTUSER="user"
 MEOWERTESTPW="password"
