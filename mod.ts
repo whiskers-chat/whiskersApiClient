@@ -38,7 +38,9 @@ export class client {
       if (responseJSON["error"] == true) {
         throw new Error(responseJSON["type"]);
       }
+
       this.#token = responseJSON["token"];
+
       return {
         error: null,
         success: true,
@@ -108,6 +110,7 @@ export class client {
       if (responseJSON["error"] == true) {
         throw new Error(responseJSON["type"]);
       }
+
       return {
         error: null,
         success: true,
@@ -122,8 +125,12 @@ export class client {
     }
   }
 
-  async sendTypingHome(): Promise<miniResult> {
-    const endPoint = `/home/typing`;
+  async sendTyping(chatID: string): Promise<miniResult> {
+    let endPoint = `/chats/${chatID}/typing`;
+
+    if (chatID == "home") {
+      endPoint = `/home/typing`;
+    }
 
     const request = {
       method: "POST",
@@ -140,6 +147,7 @@ export class client {
       if (responseJSON["error"] == true) {
         throw new Error(responseJSON["type"]);
       }
+
       return {
         error: null,
         success: true,
