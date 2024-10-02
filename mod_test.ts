@@ -26,3 +26,10 @@ Deno.test("meowerTypingHome", async () => {
   const result: miniResult = await user.sendTypingHome();
   assertEquals(result.success, true);
 })
+
+Deno.test("meowerSetQuote", async () => {
+  let user = new client(Deno.env.get("MEOWERTESTUSER")!,Deno.env.get("MEOWERTESTPW")!);
+  await user.login();
+  const result: miniResult = await user.setQuote("Deno Test Ran on: " + new Date().toString());
+  assertEquals(result.success, true);
+})
