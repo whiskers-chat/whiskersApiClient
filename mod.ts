@@ -49,4 +49,36 @@ export class client {
       }
     }
   }
+
+  async sendTypingHome(): Promise<miniResult> {
+    const endPoint = `/home/typing`
+
+    const request = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': this.#token
+      },
+    }
+
+    try {
+      const response = await fetch(this.#meowerRESTurl + endPoint, request);
+      const responseJSON = await response.json();
+
+      if (responseJSON["error"] == true) {
+        throw new Error(responseJSON["type"]);
+      }
+      return {
+        error: null,
+        success: true,
+      }
+    } catch(err: any) {
+      console.log("Endpoint: " + endPoint)
+      console.error(err);
+      return {
+        error: err.toString(),
+        success: false,
+      }
+    }
+  }
 }
