@@ -29,7 +29,17 @@ Deno.test("meowerTypingHome", async () => {
     Deno.env.get("MEOWERTESTPW")!,
   );
   await user.login();
-  const result: miniResult = await user.sendTypingHome();
+  const result: miniResult = await user.sendTyping("home");
+  assertEquals(result.success, true);
+});
+
+Deno.test("meowerTypingLiveChat", async () => {
+  let user = new client(
+    Deno.env.get("MEOWERTESTUSER")!,
+    Deno.env.get("MEOWERTESTPW")!,
+  );
+  await user.login();
+  const result: miniResult = await user.sendTyping("livechat");
   assertEquals(result.success, true);
 });
 
