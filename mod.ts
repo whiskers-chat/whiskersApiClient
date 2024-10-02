@@ -1,7 +1,7 @@
 export type miniResult = {
-  error: string | null,
-  success: boolean,
-}
+  error: string | null;
+  success: boolean;
+};
 
 export class client {
   #username: string;
@@ -19,22 +19,22 @@ export class client {
     this.#meowerRESTurl = REST;
     this.#meowerWebSocketUrl = ws;
   }
-  
+
   async login(): Promise<miniResult> {
-    const endPoint = "/auth/login"
+    const endPoint = "/auth/login";
 
     const request = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         "username": this.#username,
         "password": this.#password,
-      })
-    }
+      }),
+    };
 
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
-      const responseJSON= await response.json();
+      const responseJSON = await response.json();
       if (responseJSON["error"] == true) {
         throw new Error(responseJSON["type"]);
       }
@@ -42,29 +42,29 @@ export class client {
       return {
         error: null,
         success: true,
-      }
-    } catch(err: any) {
-      console.log("Endpoint: " + endPoint)
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
       return {
         error: err.toString(),
         success: false,
-      }
+      };
     }
   }
-  
+
   async setQuote(quote: string): Promise<miniResult> {
-    const endPoint = `/me/config`
+    const endPoint = `/me/config`;
 
     const request = {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        'token': this.#token,
+        "Content-Type": "application/json",
+        "token": this.#token,
       },
       body: JSON.stringify({
-        'quote': quote,
-      })
-    }
+        "quote": quote,
+      }),
+    };
 
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
@@ -76,27 +76,62 @@ export class client {
       return {
         error: null,
         success: true,
-      }
-    } catch(err: any) {
-      console.log("Endpoint: " + endPoint)
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
       console.error(err);
       return {
         error: err.toString(),
         success: false,
+      };
+    }
+  }
+
+  async setPfpColor(color: string): Promise<miniResult> {
+    const endPoint = `/me/config`;
+
+    const request = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "token": this.#token,
+      },
+      body: JSON.stringify({
+        "avatar_color": color,
+      }),
+    };
+
+    try {
+      const response = await fetch(this.#meowerRESTurl + endPoint, request);
+      const responseJSON = await response.json();
+
+      if (responseJSON["error"] == true) {
+        throw new Error(responseJSON["type"]);
       }
+      return {
+        error: null,
+        success: true,
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
+      console.error(err);
+      return {
+        error: err.toString(),
+        success: false,
+      };
     }
   }
 
   async sendTypingHome(): Promise<miniResult> {
-    const endPoint = `/home/typing`
+    const endPoint = `/home/typing`;
 
     const request = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'token': this.#token
+        "Content-Type": "application/json",
+        "token": this.#token,
       },
-    }
+    };
 
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
@@ -108,14 +143,49 @@ export class client {
       return {
         error: null,
         success: true,
-      }
-    } catch(err: any) {
-      console.log("Endpoint: " + endPoint)
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
       console.error(err);
       return {
         error: err.toString(),
         success: false,
+      };
+    }
+  }
+
+  async setAvatar(iconID: string): Promise<miniResult> {
+    const endPoint = `/me/config`;
+
+    const request = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "token": this.#token,
+      },
+      body: JSON.stringify({
+        "avatar": iconID,
+      }),
+    };
+
+    try {
+      const response = await fetch(this.#meowerRESTurl + endPoint, request);
+      const responseJSON = await response.json();
+
+      if (responseJSON["error"] == true) {
+        throw new Error(responseJSON["type"]);
       }
+      return {
+        error: null,
+        success: true,
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
+      console.error(err);
+      return {
+        error: err.toString(),
+        success: false,
+      };
     }
   }
 }
