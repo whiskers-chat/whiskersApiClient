@@ -1,5 +1,6 @@
 # whiskersApiClient
 An API client for meower
+Branch Protection Test
 ## Running tests
 Before running tests, create a Dotenv file with a valid username and password, as shown below.
 ```Dotenv
