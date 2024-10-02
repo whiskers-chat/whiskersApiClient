@@ -20,8 +20,6 @@ export class client {
     this.#meowerWebSocketUrl = ws;
   }
   
-  // TODO: Add logging
-  // TODO: Return an error if the password is invalid
   async login(): Promise<miniResult> {
     const endPoint = "/auth/login"
 
@@ -37,12 +35,51 @@ export class client {
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
       const responseJSON= await response.json();
+      if (responseJSON["error"] == true) {
+        throw new Error(responseJSON["type"]);
+      }
       this.#token = responseJSON["token"];
       return {
         error: null,
         success: true,
       }
     } catch(err: any) {
+      console.log("Endpoint: " + endPoint)
+      return {
+        error: err.toString(),
+        success: false,
+      }
+    }
+  }
+  
+  async setQuote(quote: string): Promise<miniResult> {
+    const endPoint = `/me/config`
+
+    const request = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': this.#token,
+      },
+      body: JSON.stringify({
+        'quote': quote,
+      })
+    }
+
+    try {
+      const response = await fetch(this.#meowerRESTurl + endPoint, request);
+      const responseJSON = await response.json();
+
+      if (responseJSON["error"] == true) {
+        throw new Error(responseJSON["type"]);
+      }
+      return {
+        error: null,
+        success: true,
+      }
+    } catch(err: any) {
+      console.log("Endpoint: " + endPoint)
+      console.error(err);
       return {
         error: err.toString(),
         success: false,
