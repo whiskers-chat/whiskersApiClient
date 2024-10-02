@@ -45,7 +45,6 @@ export class client {
         error: null,
         success: true,
       };
-      
     } catch (err: any) {
       console.log("Endpoint: " + endPoint);
       return {
@@ -129,7 +128,7 @@ export class client {
   async sendTyping(chatID: string): Promise<miniResult> {
     let endPoint = `/chats/${chatID}/typing`;
 
-    if (chatID == "home") { 
+    if (chatID == "home") {
       endPoint = `/home/typing`;
     }
 
@@ -153,7 +152,6 @@ export class client {
         error: null,
         success: true,
       };
-
     } catch (err: any) {
       console.log("Endpoint: " + endPoint);
       console.error(err);
