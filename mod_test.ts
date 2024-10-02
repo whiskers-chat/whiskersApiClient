@@ -9,7 +9,7 @@ Deno.test("testingEnvFileSetup", () => {
   if (Deno.env.get("MEOWERTESTPW") === undefined) {
     console.warn("The env file is missing a password for testing");
   }
-  
+
   assertNotEquals(Deno.env.get("MEOWERTESTUSER"), undefined);
   assertNotEquals(Deno.env.get("MEOWERTESTPW"), undefined);
 })
@@ -17,5 +17,12 @@ Deno.test("testingEnvFileSetup", () => {
 Deno.test("meowerAuth", async () => {
   let user = new client(Deno.env.get("MEOWERTESTUSER")!,Deno.env.get("MEOWERTESTPW")!);
   const result: miniResult = await user.login();
+  assertEquals(result.success, true);
+})
+
+Deno.test("meowerTypingHome", async () => {
+  let user = new client(Deno.env.get("MEOWERTESTUSER")!,Deno.env.get("MEOWERTESTPW")!);
+  await user.login();
+  const result: miniResult = await user.sendTypingHome();
   assertEquals(result.success, true);
 })
