@@ -1,0 +1,13 @@
+{
+  "name": "@whiskers/apiclient",
+  "version": "0.1.0",
+  "exports": "./mod.ts",
+  "tasks": {
+    "dev": "deno test --watch mod.ts",
+    "tests": "deno test --allow-read --allow-env --allow-net"
+  },
+  "license": "MIT",
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
