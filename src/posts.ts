@@ -36,7 +36,6 @@ export type postData = {
   "pinned": false;
   "reactions": reaction[];
   "emojis": emoji[];
-  "stickers": [];
   "nonce"?: string;
   "type": 1;
   "post_id": string;
@@ -53,11 +52,11 @@ export type postData = {
 };
 
 export class post {
-    #apiClient: client;
-    data: postData;
+  #apiClient: client;
+  data: postData;
 
-    constructor(data: postData, apiClient: client) {
-        this.data = data;
-        this.#apiClient = apiClient;
-    }
+  constructor(data: postData, apiClient: client) {
+    this.data = data;
+    this.#apiClient = apiClient;
+  }
 }

@@ -1,6 +1,6 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
 import "jsr:@std/dotenv/load";
-import { client, type miniResult } from "./mod.ts";
+import { client, type miniResult } from "../src/mod.ts";
 
 Deno.test("testingEnvFileSetup", () => {
   if (Deno.env.get("MEOWERTESTUSER") === undefined) {

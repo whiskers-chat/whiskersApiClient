@@ -1,6 +1,16 @@
+import type { post, postData } from "./posts.ts";
+
 export type miniResult = {
   error: string | null;
   success: boolean;
+};
+
+export type newPostData = {
+  "attachments"?: string[];
+  "content": string;
+  "nonce"?: string;
+  "reply_to"?: string[];
+  "stickers"?: string[];
 };
 
 export class client {
@@ -148,6 +158,57 @@ export class client {
         throw new Error(responseJSON["type"]);
       }
 
+      return {
+        error: null,
+        success: true,
+      };
+    } catch (err: any) {
+      console.log("Endpoint: " + endPoint);
+      console.error(err);
+      return {
+        error: err.toString(),
+        success: false,
+      };
+    }
+  }
+
+  async sendMessage(
+    content: string,
+    chatID: string,
+    reply_to?: string[],
+    attachments?: string[],
+  ): Promise<miniResult> {
+    let endPoint = `/posts/${chatID}`;
+
+    if (chatID == "home") {
+      endPoint = `/home/`;
+    }
+
+    let requestBody: newPostData = {
+      "content": content,
+    };
+
+    if (reply_to !== undefined) {
+      requestBody["reply_to"] = reply_to;
+    }
+
+    if (attachments !== undefined) {
+      requestBody["attachments"] = attachments;
+    }
+
+    const request = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "token": this.#token,
+      },
+      body: JSON.stringify(requestBody),
+    };
+
+    try {
+      const response = await fetch(this.#meowerRESTurl + endPoint, request);
+      const responseJSON = await response.json();
+      console.log(responseJSON);
       return {
         error: null,
         success: true,
