@@ -35,3 +35,23 @@ Deno.test("replyPostHome", async () => {
   
   assertEquals(result.success, true);
 });
+
+Deno.test("reactPostHome", async () => {
+  let user = new client(
+    Deno.env.get("MEOWERTESTUSER")!,
+    Deno.env.get("MEOWERTESTPW")!,
+  );
+
+  await user.login();
+
+  const firstPostResult: miniResult = await user.sendMessage(
+    "This is a test post made by a deno testing workflow for testing reactions, please ignore it. If you have any issues, or want this disabled, contact @Blahaj on meower.",
+    "home",
+  );
+
+  const postResult: post = new post(firstPostResult.result, user);
+
+  const result: miniResult = await postResult.addReaction("🏳️‍⚧️")
+  
+  assertEquals(result.success, true);
+});

@@ -1,4 +1,4 @@
-import type { client } from "./mod.ts";
+import type { client, miniResult } from "./mod.ts";
 
 export type emoji = {
   "_id": string;
@@ -43,7 +43,7 @@ export type postData = {
   "p": string;
   "isDeleted": boolean;
   "pinned": boolean;
-  "post_origin": string,
+  "post_origin": string;
   "reactions": reaction[];
   "reply_to": postData[];
   "stickers": [];
@@ -66,8 +66,23 @@ export class post {
     content: string,
     attachments?: string[],
   ) {
-    const result = await this.#apiClient.sendMessage(content,"home",[this.data["_id"]]);
-    return result
-  }
-}
+    let result;
 
+    if (attachments !== undefined) {
+      result = await this.#apiClient.sendMessage(content, "home", [
+        this.data["_id"],
+      ], attachments);
+    } else {
+      result = await this.#apiClient.sendMessage(content, "home", [
+        this.data["_id"],
+      ]);
+    }
+
+    return result;
+  }
+
+  async addReaction(char: string): Promise<miniResult> {
+    const result = await this.#apiClient.addReaction(this.data._id, encodeURIComponent(char));
+    return result;
+  } 
+}
