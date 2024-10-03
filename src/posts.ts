@@ -25,30 +25,32 @@ export type attachment = {
 
 export type postData = {
   "_id": string;
-  "post_origin": string;
+  "attachments": attachment[];
+  "author": {
+    "_id": string;
+    "avatar": string;
+    "avatar_color": string;
+    "flags": number;
+    "pfp_data": number;
+    "uuid": string;
+  };
+  "emojis": emoji[];
+  "error"?: boolean;
   "u": string;
   "t": {
     "e": number;
   };
   "p": string;
-  "attachments": attachment[];
-  "isDeleted": false;
-  "pinned": false;
+  "isDeleted": boolean;
+  "pinned": boolean;
+  "post_origin": string,
   "reactions": reaction[];
-  "emojis": emoji[];
+  "reply_to": postData[];
+  "stickers": [];
   "nonce"?: string;
-  "type": 1;
+  "type": number;
   "post_id": string;
   "edited_at"?: number;
-  "author": {
-    "_id": string;
-    "uuid": string;
-    "pfp_data": number;
-    "avatar": string;
-    "avatar_color": string;
-    "flags": number;
-  };
-  "reply_to": postData[];
 };
 
 export class post {
@@ -59,4 +61,13 @@ export class post {
     this.data = data;
     this.#apiClient = apiClient;
   }
+
+  async reply(
+    content: string,
+    attachments?: string[],
+  ) {
+    const result = await this.#apiClient.sendMessage(content,"home",[this.data["_id"]]);
+    return result
+  }
 }
+

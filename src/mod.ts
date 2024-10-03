@@ -3,6 +3,7 @@ import type { post, postData } from "./posts.ts";
 export type miniResult = {
   error: string | null;
   success: boolean;
+  result?: postData | any;
 };
 
 export type newPostData = {
@@ -45,6 +46,7 @@ export class client {
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
       const responseJSON = await response.json();
+
       if (responseJSON["error"] == true) {
         throw new Error(responseJSON["type"]);
       }
@@ -208,10 +210,11 @@ export class client {
     try {
       const response = await fetch(this.#meowerRESTurl + endPoint, request);
       const responseJSON = await response.json();
-      console.log(responseJSON);
+      const resultJSON = await responseJSON;
       return {
         error: null,
         success: true,
+        result: resultJSON,
       };
     } catch (err: any) {
       console.log("Endpoint: " + endPoint);
