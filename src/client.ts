@@ -1,17 +1,17 @@
 export interface signup_data {
-  hCaptcha_Code?: string;
+  hCaptcha_Code?: string; // Meower uses HCaptcha to protect sign up, this is the password that is returned by HCaptcha that is required to login
 }
 
 export interface login_data {
-  authCode?: string;
-  loginMethod?: "modern" | "classic";
-  connectWebsocket?: boolean;
+  authCode?: string; // 6 digit 2fa auth code
+  loginMethod?: "modern" | "classic"; // Modern is the REST based login while classic uses the webSocket to login
+  connectWebsocket?: boolean; // Should the client also connect to the webSocket when logging in, if the classic login method is true, this must also be true
 }
 
 export interface updatePW_data {
-  oldPassword: string;
-  newPassword: string;
-  authCode?: string;
+  oldPassword: string; // The users old password
+  newPassword: string; // The users new password, make sure the user has confirmed it twice
+  authCode?: string; // The otp code if a user has a authenticator enabled
 }
 
 export class client {

@@ -63,12 +63,12 @@ export interface reaction_data {
 export interface shareLink_Branding {
   bgColor: string; // Background color
   bgColorDark?: string; // Background color in dark mode
-  logo: attachment; // Logo to show on the page
+  logo: string; // URL of logo to show on the page
   logoLink: string; // Link to navigate to on click of the logo
-  logoDark?: attachment; // Logo to show in dark mode
+  logoDark?: attachment; // URL of logo to show in dark mode
   openDomain?: string; // The domain to open the post in
   customCSS?: string; // URL of a custom style sheet to use
-  showWhiskersCredit?: boolean; // Should the page show a small credit to the whiskers share service in the corner.
+  showWhiskersCredit?: boolean; // Should the page show a small credit to the whiskers share service in the corner
 }
 
 export interface shareLink_data {

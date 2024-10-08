@@ -9,6 +9,16 @@ export type rawAttachment = {
   "height": number;
 };
 
+export interface attachmentUpload_data {
+  rawUpload: any;
+}
+
+export async function uploadAttachment(
+  client: client,
+  data: attachmentUpload_data,
+) {
+}
+
 export class attachment {
   data: rawAttachment;
 
