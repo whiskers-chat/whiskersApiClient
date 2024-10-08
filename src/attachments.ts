@@ -10,7 +10,7 @@ export type rawAttachment = {
 };
 
 export interface attachmentUpload_data {
-  rawUpload: any;
+  rawUpload: any;  // Raw data for the upload
 }
 
 export async function uploadAttachment(

@@ -41,6 +41,14 @@ export interface updateUserProfile_Data {
   lastFM?: string; // LastFM account, not used by all clients
 }
 
+export interface updateFavoriteChats_Data {
+  favoriteList: string[]; // List of the id's of chats the user has in their favorites
+}
+
+export interface updateProfileImage_Data {
+  rawProfileImage: any; // Raw image data for the profile
+}
+
 export class user {
   rawData: rawUserData;
 
@@ -49,5 +57,11 @@ export class user {
   }
 
   async updateProfile(client: client, data: updateUserProfile_Data) {
+  }
+
+  async updateProfileImage(client: client, data: updateProfileImage_Data) {
+  }
+
+  async updateFavoriteChats(client: client, data: updateFavoriteChats_Data) {
   }
 }
