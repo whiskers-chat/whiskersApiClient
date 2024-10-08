@@ -1,4 +1,5 @@
-import type { client, miniResult } from "./mod.ts";
+import { attachment, rawAttachment } from "./attachments.ts";
+import { client } from "./client.ts";
 
 export type emoji = {
   "_id": string;
@@ -14,18 +15,9 @@ export type reaction = {
   "username"?: string;
 };
 
-export type attachment = {
-  "id": string;
-  "mime": string;
-  "filename": string;
-  "size": number;
-  "width": number;
-  "height": number;
-};
-
 export type postData = {
   "_id": string;
-  "attachments": attachment[];
+  "attachments": rawAttachment[];
   "author": {
     "_id": string;
     "avatar": string;
@@ -53,36 +45,71 @@ export type postData = {
   "edited_at"?: number;
 };
 
+export interface post_data {
+  content?: string,
+  emojis?: emoji[]
+  attachments?: attachment[]
+}
+
+export interface report_data {
+  reason: string,
+  comment: string,
+}
+
+export interface reaction_data {
+  emote: string,
+}
+
+export interface shareLink_Branding {
+  bgColor: string,
+  bgColorDark?: string,
+  logo: attachment,
+  logoLink: string,
+  logoDark?: attachment,
+  openDomain?: string,
+  customCSS?: string,
+  showWhiskersCredit?: boolean,
+}
+
+export interface shareLink_config {
+  shortURL?: boolean,
+  showReplyHistory?: boolean,
+  showPFPImages?: boolean,
+  branding?: shareLink_Branding,
+}
+
 export class post {
-  #apiClient: client;
   data: postData;
 
-  constructor(data: postData, apiClient: client) {
+  constructor(data: postData) {
     this.data = data;
-    this.#apiClient = apiClient;
   }
 
-  async reply(
-    content: string,
-    attachments?: string[],
-  ) {
-    let result;
+  async reply(client: client, data: post_data) {
 
-    if (attachments !== undefined) {
-      result = await this.#apiClient.sendMessage(content, "home", [
-        this.data["_id"],
-      ], attachments);
-    } else {
-      result = await this.#apiClient.sendMessage(content, "home", [
-        this.data["_id"],
-      ]);
-    }
-
-    return result;
   }
 
-  async addReaction(char: string): Promise<miniResult> {
-    const result = await this.#apiClient.addReaction(this.data._id, encodeURIComponent(char));
-    return result;
-  } 
+  async addReaction(client: client, data: reaction_data) {
+
+  }
+
+  async removeReaction(client: client, data: reaction_data) {
+
+  }
+
+  async report(client: client, data: report_data) {
+
+  }
+
+  async createShareLink(client: client) {
+
+  }
+
+  async deletePost(client: client) {
+
+  }
+
+  async update(client: client, data: post_data) {
+
+  }
 }
