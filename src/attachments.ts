@@ -1,26 +1,21 @@
 import { client } from "./client.ts";
 
 export type rawAttachment = {
-    "id": string;
-    "mime": string;
-    "filename": string;
-    "size": number;
-    "width": number;
-    "height": number;
+  "id": string;
+  "mime": string;
+  "filename": string;
+  "size": number;
+  "width": number;
+  "height": number;
 };
 
 export class attachment {
-    data: rawAttachment;
+  data: rawAttachment;
 
-    constructor(data: rawAttachment) {
-        this.data = data;
-    }
+  constructor(data: rawAttachment) {
+    this.data = data;
+  }
 
-    getRawURL(client: client) {
-
-    }
-
-    async createShareLink(client: client) {
-
-    }
+  getRawURL(client: client) {
+  }
 }
