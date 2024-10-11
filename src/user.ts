@@ -1,4 +1,5 @@
 import type { client } from "./client.ts";
+import type { getPost_Data } from "./posts.ts";
 
 export type rawUserData = {
   "_id": string;
@@ -49,11 +50,17 @@ export interface updateProfileImage_Data {
   rawProfileImage: any; // Raw image data for the profile
 }
 
+export interface userConstructor_Data {
+  UUID?: string; // The UUID of the user; if rawUserData or username is not included than this must be included.
+  username?: string; // The username of the user
+  rawUserData?: rawUserData;
+}
+
 export class user {
   rawData: rawUserData;
 
-  constructor(data: rawUserData) {
-    this.rawData = data;
+  constructor(client: client, data: userConstructor_Data) {
+    // TODO: Get the user data from the server
   }
 
   async updateProfile(client: client, data: updateUserProfile_Data) {
@@ -63,5 +70,8 @@ export class user {
   }
 
   async updateFavoriteChats(client: client, data: updateFavoriteChats_Data) {
+  }
+
+  async getPosts(client: client, data: getPost_Data) {
   }
 }

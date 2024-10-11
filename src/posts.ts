@@ -78,6 +78,10 @@ export interface shareLink_data {
   branding?: shareLink_Branding; // Set custom branding for the share link
 }
 
+export interface getPost_Data {
+  page: number; // The page of posts to get
+}
+
 export class post {
   data: postData;
 
