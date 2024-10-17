@@ -61,6 +61,8 @@ export class user {
 
   constructor(client: client, data: userConstructor_Data) {
     // TODO: Get the user data from the server
+    // TODO: REMOVE NON NULL THING
+    this.rawData = data.rawUserData!;
   }
 
   async updateProfile(client: client, data: updateUserProfile_Data) {

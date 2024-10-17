@@ -1,10 +1,16 @@
+import { user, type rawUserData, type user } from "./user.ts";
+
+export type loginResponseData = {
+  "account": rawUserData;
+  "error": boolean;
+  "token": string;
+} 
 export interface signup_data {
   hCaptcha_Code?: string; // Meower uses HCaptcha to protect sign up, this is the password that is returned by HCaptcha that is required to login
 }
 
 export interface login_data {
   authCode?: string; // 6 digit 2fa auth code
-  loginMethod?: "modern" | "classic"; // Modern is the REST based login while classic uses the webSocket to login
   connectWebsocket?: boolean; // Should the client also connect to the webSocket when logging in, if the classic login method is true, this must also be true
 }
 
@@ -19,6 +25,7 @@ export class client {
   #password: string;
   #REST_URL: string;
   #WSS_URL: string;
+  token?: string;
 
   constructor(
     accountUsername: string,
@@ -36,7 +43,27 @@ export class client {
       : "wss://server.meower.org/?v=1";
   }
 
-  async login(data: login_data) {
+  async login(data: login_data): Promise<user> {
+    const requestEndpoint = this.#REST_URL + "/auth/login"
+    const requestData = {
+      method: "post",
+      body: JSON.stringify({
+        "username": this.#username,
+        "password": this.#password,
+      })
+    }
+    const rawResponse: Response = await fetch(requestEndpoint, requestData);
+
+    const responseData: loginResponseData = await rawResponse.json();
+    
+    const userData: user = new user(this, { rawUserData: responseData.account });
+    this.token = responseData.token;
+
+    if (data.connectWebsocket !== false) {
+      // Connect to websocket
+    }
+
+    return userData;
   }
 
   async signup(data: signup_data) {
