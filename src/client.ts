@@ -7,9 +7,25 @@ export type loginResponseData = {
   "type"?: string;
 };
 
+export type authenticator = {
+  "_id": string;
+  "nickname": string;
+  "registered_at": number;
+  "type": string;
+};
+
+export type autoGetResponseData = {
+  "autoGet": [];
+  "error": boolean;
+  "#page": number;
+  "pages": number;
+  "type"?: string;
+};
+
 export type miniResponse = {
   error: boolean;
   errorData?: string[];
+  debugInfo?: any[];
   result?: any;
 };
 
@@ -54,10 +70,11 @@ export class client {
   async login(data: loginData): Promise<miniResponse> {
     const requestEndpoint = this.#REST_URL + "/auth/login";
     const requestData = {
-      method: "post",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        "username": data.username,
         "password": data.password,
+        "username": data.username,
         "totp_code": data.authCode ?? undefined,
       }),
     };
@@ -72,6 +89,7 @@ export class client {
         const errorResult: miniResponse = {
           error: true,
           errorData: ["invalidData"],
+          debugInfo: [rawResponse, responseData, requestData],
         };
         return errorResult;
         break;
@@ -80,11 +98,15 @@ export class client {
         let errorResult: miniResponse = {
           error: true,
           errorData: ["invalidCredentials"],
+          debugInfo: [rawResponse, responseData, requestData],
         };
-        if (responseData.type === "invalidCredentials") { errorResult = {
+        if (responseData.type === "invalidCredentials") {
+          errorResult = {
             error: true,
             errorData: ["mfaRequired"],
-          };}
+            debugInfo: [rawResponse, responseData, requestData],
+          };
+        }
         return errorResult;
         break;
       }
@@ -92,6 +114,7 @@ export class client {
         const errorResult: miniResponse = {
           error: true,
           errorData: ["rateLimited"],
+          debugInfo: [rawResponse, responseData, requestData],
         };
         return errorResult;
         break;
@@ -100,6 +123,7 @@ export class client {
         const errorResult: miniResponse = {
           error: true,
           errorData: ["serverError"],
+          debugInfo: [rawResponse, responseData, requestData],
         };
         return errorResult;
         break;
@@ -112,6 +136,7 @@ export class client {
           const errorResult: miniResponse = {
             error: true,
             errorData: ["accountDeleted"],
+            debugInfo: [rawResponse, responseData, requestData],
           };
           return errorResult;
           break;
@@ -120,6 +145,7 @@ export class client {
           const errorResult: miniResponse = {
             error: true,
             errorData: ["unknownError", responseData.type!],
+            debugInfo: [rawResponse, responseData, requestData],
           };
           return errorResult;
           break;
@@ -148,10 +174,14 @@ export class client {
   async signup(data: signupData) {
   }
 
-  async updatePassword(data: updatePwData) {
+  async updatePassword(data: updatePwData): Promise<miniResponse> {
+    // TODO: Check the request data before sending it to make sure its valid
     const requestEndpoint = this.#REST_URL + "/me/password";
     const requestData = {
-      method: "post",
+      method: "patch",
+      Headers: JSON.stringify({
+        token: this.token ?? undefined,
+      }),
       body: JSON.stringify({
         "new": data.newPassword,
         "old": data.oldPassword,
@@ -164,7 +194,6 @@ export class client {
 
     switch (await rawResponse.status) {
       case 400: {
-        // TODO: Check the request before sending it to make sure its valid
         const errorResult: miniResponse = {
           error: true,
           errorData: ["invalidData"],
@@ -230,12 +259,170 @@ export class client {
   async addAuthenticator() {
   }
 
-  async getAuthenticator() {
+  async getAuthenticators() {
+    const requestEndpoint = this.#REST_URL + "/me/authenticators";
+    const requestData = {
+      method: "get",
+      headers: {
+        "token": this.token ?? "undefined",
+      },
+    };
+
+    const rawResponse: Response = await fetch(requestEndpoint, requestData);
+
+    const responseData: autoGetResponseData = await rawResponse.json();
+
+    const authenticatorList: authenticator[] = responseData.autoGet;
+
+    switch (await rawResponse.status) {
+      case 400: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidData"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 401: {
+        let errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidCredentials"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 429: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["rateLimited"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 500: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["serverError"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+    }
+
+    if (responseData.error == true) {
+      switch (responseData.type) {
+        case "accountDeleted": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["accountDeleted"],
+            debugInfo: [rawResponse, responseData, requestData],
+          };
+          return errorResult;
+          break;
+        }
+        default: {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["unknownError", responseData.type!],
+            debugInfo: [rawResponse, responseData, requestData],
+          };
+          return errorResult;
+          break;
+        }
+      }
+    }
+
+    return {
+      result: authenticatorList,
+      error: false,
+    };
   }
 
   async removeAuthenticator() {
   }
 
   async clearTokens() {
+    const requestEndpoint = this.#REST_URL + "/me/tokens";
+    const requestData = {
+      method: "delete",
+      headers: {
+        "token": this.token ?? "undefined",
+      },
+    };
+
+    const rawResponse: Response = await fetch(requestEndpoint, requestData);
+
+    const responseData: loginResponseData = await rawResponse.json();
+
+    switch (await rawResponse.status) {
+      case 400: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidData"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 401: {
+        let errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidCredentials"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 429: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["rateLimited"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+      case 500: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["serverError"],
+          debugInfo: [rawResponse, responseData, requestData],
+        };
+        return errorResult;
+        break;
+      }
+    }
+
+    if (responseData.error == true) {
+      switch (responseData.type) {
+        case "accountDeleted": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["accountDeleted"],
+            debugInfo: [rawResponse, responseData, requestData],
+          };
+          return errorResult;
+          break;
+        }
+        default: {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["unknownError", responseData.type!],
+            debugInfo: [rawResponse, responseData, requestData],
+          };
+          return errorResult;
+          break;
+        }
+      }
+    }
+
+    return {
+      result: "success",
+      error: false,
+    };
   }
 }
