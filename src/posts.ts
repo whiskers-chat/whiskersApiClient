@@ -37,7 +37,7 @@ export type rawPostData = {
   "pinned": boolean;
   "post_origin": string;
   "reactions": reaction[];
-  "reply_to": postData[];
+  "reply_to": postData[] | null[];
   "stickers": [];
   "nonce"?: string;
   "type": number;
