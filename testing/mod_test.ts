@@ -35,7 +35,7 @@ Deno.test("clientLogin", async (test) => {
     assertEquals(result.error, false);
     assertNotEquals(meower.token, undefined);
   });
-  
+
   await test.step("clearTokens", async () => {
     const result = await meower.clearTokens();
 
