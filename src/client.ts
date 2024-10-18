@@ -1,17 +1,29 @@
-import { user, type rawUserData, type user } from "./user.ts";
+import { type rawUserData, user } from "./user.ts";
 
 export type loginResponseData = {
   "account": rawUserData;
   "error": boolean;
   "token": string;
-} 
+  "type"?: string;
+};
+
+export type miniResponse = {
+  error: boolean;
+  errorData?: string[];
+  result?: any;
+};
+
 export interface signup_data {
+  username: string; // user Username
+  password: string; // User password
   hCaptcha_Code?: string; // Meower uses HCaptcha to protect sign up, this is the password that is returned by HCaptcha that is required to login
 }
 
 export interface login_data {
+  username: string; // user Username
+  password: string; // User password
   authCode?: string; // 6 digit 2fa auth code
-  connectWebsocket?: boolean; // Should the client also connect to the webSocket when logging in, if the classic login method is true, this must also be true
+  connectWebsocket?: boolean; // Should the client also connect to the webSocket when logging in, default is true.
 }
 
 export interface updatePW_data {
@@ -21,20 +33,16 @@ export interface updatePW_data {
 }
 
 export class client {
-  #username: string;
-  #password: string;
+  #username?: string;
+  #password?: string;
   #REST_URL: string;
   #WSS_URL: string;
   token?: string;
 
   constructor(
-    accountUsername: string,
-    accountPassword: string,
     ServerREST_URL?: string,
     ServerWSS_URL?: string,
   ) {
-    this.#username = accountUsername;
-    this.#password = accountPassword;
     this.#REST_URL = ServerREST_URL !== undefined
       ? ServerREST_URL
       : "https://api.meower.org";
@@ -43,27 +51,102 @@ export class client {
       : "wss://server.meower.org/?v=1";
   }
 
-  async login(data: login_data): Promise<user> {
-    const requestEndpoint = this.#REST_URL + "/auth/login"
+  async login(data: login_data): Promise<miniResponse> {
+    const requestEndpoint = this.#REST_URL + "/auth/login";
     const requestData = {
       method: "post",
       body: JSON.stringify({
-        "username": this.#username,
-        "password": this.#password,
-      })
-    }
+        "username": data.username,
+        "password": data.password,
+        "totp_code": data.authCode ?? undefined,
+      }),
+    };
+
     const rawResponse: Response = await fetch(requestEndpoint, requestData);
 
     const responseData: loginResponseData = await rawResponse.json();
-    
-    const userData: user = new user(this, { rawUserData: responseData.account });
-    this.token = responseData.token;
 
-    if (data.connectWebsocket !== false) {
+    if (responseData.error == true) {
+      switch (responseData.type) {
+        case "mfaRequired": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["mfaRequired"],
+          };
+          return errorResult;
+          break;
+        }
+        case "Unauthorized": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["wrongCreds"],
+          };
+          return errorResult;
+          break;
+        }
+        case "badRequest": {
+          // TODO: Check the request before sending it to make sure its valid
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["invalidData"],
+          };
+          return errorResult;
+          break;
+        }
+        case "accountDeleted": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["accountDeleted"],
+          };
+          return errorResult;
+          break;
+        }
+        default: {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["unknownError", responseData.type!],
+          };
+          return errorResult;
+          break;
+        }
+      }
+    }
+    // Checks for status codes
+    switch (await rawResponse.status) {
+      case 429: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["rateLimited"],
+        };
+        return errorResult;
+        break;
+      }
+      case 500: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["serverError"],
+        };
+        return errorResult;
+        break;
+      }
+    }
+
+    const userData: user = new user(this, {
+      rawUserData: responseData.account,
+    });
+
+    this.token = responseData.token;
+    this.#password = data.password;
+    this.#username = data.username;
+    
+    if (data.connectWebsocket === true) {
       // Connect to websocket
     }
 
-    return userData;
+    return {
+      result: userData,
+      error: false,
+    };
   }
 
   async signup(data: signup_data) {
