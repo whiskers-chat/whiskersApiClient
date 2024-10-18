@@ -13,20 +13,20 @@ export type miniResponse = {
   result?: any;
 };
 
-export interface signup_data {
+export interface signupData {
   username: string; // user Username
   password: string; // User password
   hCaptcha_Code?: string; // Meower uses HCaptcha to protect sign up, this is the password that is returned by HCaptcha that is required to login
 }
 
-export interface login_data {
+export interface loginData {
   username: string; // user Username
   password: string; // User password
   authCode?: string; // 6 digit 2fa auth code
   connectWebsocket?: boolean; // Should the client also connect to the webSocket when logging in, default is true.
 }
 
-export interface updatePW_data {
+export interface updatePwData {
   oldPassword: string; // The users old password
   newPassword: string; // The users new password, make sure the user has confirmed it twice
   authCode?: string; // The otp code if a user has a authenticator enabled
@@ -51,7 +51,7 @@ export class client {
       : "wss://server.meower.org/?v=1";
   }
 
-  async login(data: login_data): Promise<miniResponse> {
+  async login(data: loginData): Promise<miniResponse> {
     const requestEndpoint = this.#REST_URL + "/auth/login";
     const requestData = {
       method: "post",
@@ -66,53 +66,28 @@ export class client {
 
     const responseData: loginResponseData = await rawResponse.json();
 
-    if (responseData.error == true) {
-      switch (responseData.type) {
-        case "mfaRequired": {
-          const errorResult: miniResponse = {
+    switch (await rawResponse.status) {
+      case 400: {
+        // TODO: Check the request before sending it to make sure its valid
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidData"],
+        };
+        return errorResult;
+        break;
+      }
+      case 401: {
+        let errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidCredentials"],
+        };
+        if (responseData.type === "invalidCredentials") { errorResult = {
             error: true,
             errorData: ["mfaRequired"],
-          };
-          return errorResult;
-          break;
-        }
-        case "Unauthorized": {
-          const errorResult: miniResponse = {
-            error: true,
-            errorData: ["wrongCreds"],
-          };
-          return errorResult;
-          break;
-        }
-        case "badRequest": {
-          // TODO: Check the request before sending it to make sure its valid
-          const errorResult: miniResponse = {
-            error: true,
-            errorData: ["invalidData"],
-          };
-          return errorResult;
-          break;
-        }
-        case "accountDeleted": {
-          const errorResult: miniResponse = {
-            error: true,
-            errorData: ["accountDeleted"],
-          };
-          return errorResult;
-          break;
-        }
-        default: {
-          const errorResult: miniResponse = {
-            error: true,
-            errorData: ["unknownError", responseData.type!],
-          };
-          return errorResult;
-          break;
-        }
+          };}
+        return errorResult;
+        break;
       }
-    }
-    // Checks for status codes
-    switch (await rawResponse.status) {
       case 429: {
         const errorResult: miniResponse = {
           error: true,
@@ -131,6 +106,27 @@ export class client {
       }
     }
 
+    if (responseData.error == true) {
+      switch (responseData.type) {
+        case "accountDeleted": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["accountDeleted"],
+          };
+          return errorResult;
+          break;
+        }
+        default: {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["unknownError", responseData.type!],
+          };
+          return errorResult;
+          break;
+        }
+      }
+    }
+
     const userData: user = new user(this, {
       rawUserData: responseData.account,
     });
@@ -138,7 +134,7 @@ export class client {
     this.token = responseData.token;
     this.#password = data.password;
     this.#username = data.username;
-    
+
     if (data.connectWebsocket === true) {
       // Connect to websocket
     }
@@ -149,10 +145,86 @@ export class client {
     };
   }
 
-  async signup(data: signup_data) {
+  async signup(data: signupData) {
   }
 
-  async updatePassword(data: updatePW_data) {
+  async updatePassword(data: updatePwData) {
+    const requestEndpoint = this.#REST_URL + "/me/password";
+    const requestData = {
+      method: "post",
+      body: JSON.stringify({
+        "new": data.newPassword,
+        "old": data.oldPassword,
+      }),
+    };
+
+    const rawResponse: Response = await fetch(requestEndpoint, requestData);
+
+    const responseData: loginResponseData = await rawResponse.json();
+
+    switch (await rawResponse.status) {
+      case 400: {
+        // TODO: Check the request before sending it to make sure its valid
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidData"],
+        };
+        return errorResult;
+        break;
+      }
+      case 401: {
+        let errorResult: miniResponse = {
+          error: true,
+          errorData: ["invalidCredentials"],
+        };
+        return errorResult;
+        break;
+      }
+      case 429: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["rateLimited"],
+        };
+        return errorResult;
+        break;
+      }
+      case 500: {
+        const errorResult: miniResponse = {
+          error: true,
+          errorData: ["serverError"],
+        };
+        return errorResult;
+        break;
+      }
+    }
+
+    if (responseData.error == true) {
+      switch (responseData.type) {
+        case "accountDeleted": {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["accountDeleted"],
+          };
+          return errorResult;
+          break;
+        }
+        default: {
+          const errorResult: miniResponse = {
+            error: true,
+            errorData: ["unknownError", responseData.type!],
+          };
+          return errorResult;
+          break;
+        }
+      }
+    }
+
+    this.#password = data.newPassword;
+
+    return {
+      result: "success",
+      error: false,
+    };
   }
 
   async addAuthenticator() {

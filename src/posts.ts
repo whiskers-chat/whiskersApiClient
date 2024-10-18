@@ -15,7 +15,7 @@ export type reaction = {
   "username"?: string;
 };
 
-export type postData = {
+export type rawPostData = {
   "_id": string;
   "attachments": rawAttachment[];
   "author": {
@@ -45,22 +45,22 @@ export type postData = {
   "edited_at"?: number;
 };
 
-export interface post_data {
+export interface postData {
   content?: string; // Content of the post, char limit is 4000
   emojis?: emoji[]; // Emojis in the post
   attachments?: attachment[]; // Attachments in the post, make sure to create them before sending the post
 }
 
-export interface report_data {
+export interface reportData {
   reason: string; // Reason for report
   comment: string; // Comment from user on why they made the report
 }
 
-export interface reaction_data {
+export interface reactionData {
   emote: string & { length: 1 }; // The emoji to set the a reaction for
 }
 
-export interface shareLink_Branding {
+export interface shareLinkBranding {
   bgColor: string; // Background color
   bgColorDark?: string; // Background color in dark mode
   logo: string; // URL of logo to show on the page
@@ -71,42 +71,42 @@ export interface shareLink_Branding {
   showWhiskersCredit?: boolean; // Should the page show a small credit to the whiskers share service in the corner
 }
 
-export interface shareLink_data {
+export interface shareLinkData {
   shortURL?: boolean; // Toggles if share link use the links.whiskers.chat url shortener
   showReplyHistory?: boolean; // Toggles the visibility of the reply chain on a post
   showPFPImages?: boolean; // Toggles the visibility of PFP images
-  branding?: shareLink_Branding; // Set custom branding for the share link
+  branding?: shareLinkBranding; // Set custom branding for the share link
 }
 
-export interface getPost_Data {
+export interface getPostData {
   page: number; // The page of posts to get
 }
 
 export class post {
-  data: postData;
-
-  constructor(data: postData) {
+  data: rawPostData;
+  // TODO: allow lookup based on id
+  constructor(data: rawPostData) {
     this.data = data;
   }
 
-  async reply(client: client, data: post_data) {
+  async reply(client: client, data: postData) {
   }
 
-  async addReaction(client: client, data: reaction_data) {
+  async addReaction(client: client, data: reactionData) {
   }
 
-  async removeReaction(client: client, data: reaction_data) {
+  async removeReaction(client: client, data: reactionData) {
   }
 
-  async report(client: client, data: report_data) {
+  async report(client: client, data: reportData) {
   }
 
-  async createShareLink(client: client, data: shareLink_data) {
+  async createShareLink(client: client, data: shareLinkData) {
   }
 
   async deletePost(client: client) {
   }
 
-  async update(client: client, data: post_data) {
+  async update(client: client, data: postData) {
   }
 }

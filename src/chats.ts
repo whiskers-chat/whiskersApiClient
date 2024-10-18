@@ -1,5 +1,5 @@
 import type { client } from "./client.ts";
-import type { getPost_Data } from "./posts.ts";
+import type { getPostData } from "./posts.ts";
 import type { user } from "./user.ts";
 
 export interface chatData {
@@ -19,13 +19,13 @@ export interface chatData {
   type: number;
 }
 
-export interface updateChat_Data {
+export interface updateChatData {
   icon?: string;
   icon_color?: string;
   nickname?: string;
 }
 
-export interface updateUsers_Data {
+export interface updateUsersData {
   user: string;
 }
 
@@ -35,7 +35,7 @@ export type emoji = {
   "name": string;
 };
 
-export interface chatConstructor_Data {
+export interface chatConstructorData {
   chatID?: string; // The ID of the chat; if chatData is not included than this must be included.
   chatData?: string;
 }
@@ -60,7 +60,7 @@ export type rawChatData = {
 export class chat {
   data: chatData;
 
-  constructor(client: client, data: chatConstructor_Data) {
+  constructor(client: client, data: chatConstructorData) {
     // TODO: Get the chatData from the server to create the class
   }
 
@@ -70,16 +70,16 @@ export class chat {
   async createPost() {
   }
 
-  async getPosts(client: client, data: getPost_Data) {
+  async getPosts(client: client, data: getPostData) {
   }
 
-  async updateChat(client: client, data: updateChat_Data) {
+  async updateChat(client: client, data: updateChatData) {
   }
 
-  async addUser(client: client, data: updateUsers_Data) {
+  async addUser(client: client, data: updateUsersData) {
   }
 
-  async removeUser(client: client, data: updateUsers_Data) {
+  async removeUser(client: client, data: updateUsersData) {
   }
 
   async deleteChat(client: client) {

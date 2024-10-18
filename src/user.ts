@@ -1,5 +1,5 @@
 import type { client } from "./client.ts";
-import type { getPost_Data } from "./posts.ts";
+import type { getPostData } from "./posts.ts";
 
 export type rawUserData = {
   "_id": string;
@@ -35,22 +35,22 @@ export type rawUserData = {
   "uuid": string; // UUID of the user
 };
 
-export interface updateUserProfile_Data {
+export interface updateUserProfileData {
   quote?: string; // User quote
   profileColor?: string; // Hex code for the pfp color
   pronouns?: string; // User Pronouns, not used by all clients
   lastFM?: string; // LastFM account, not used by all clients
 }
 
-export interface updateFavoriteChats_Data {
+export interface updateFavoriteChatsData {
   favoriteList: string[]; // List of the id's of chats the user has in their favorites
 }
 
-export interface updateProfileImage_Data {
+export interface updateProfileImageData {
   rawProfileImage: any; // Raw image data for the profile
 }
 
-export interface userConstructor_Data {
+export interface userConstructorData {
   UUID?: string; // The UUID of the user; if rawUserData or username is not included than this must be included.
   username?: string; // The username of the user
   rawUserData?: rawUserData;
@@ -59,21 +59,21 @@ export interface userConstructor_Data {
 export class user {
   rawData: rawUserData;
 
-  constructor(client: client, data: userConstructor_Data) {
+  constructor(client: client, data: userConstructorData) {
     // TODO: Get the user data from the server
     // TODO: REMOVE NON NULL THING
     this.rawData = data.rawUserData!;
   }
 
-  async updateProfile(client: client, data: updateUserProfile_Data) {
+  async updateProfile(client: client, data: updateUserProfileData) {
   }
 
-  async updateProfileImage(client: client, data: updateProfileImage_Data) {
+  async updateProfileImage(client: client, data: updateProfileImageData) {
   }
 
-  async updateFavoriteChats(client: client, data: updateFavoriteChats_Data) {
+  async updateFavoriteChats(client: client, data: updateFavoriteChatsData) {
   }
 
-  async getPosts(client: client, data: getPost_Data) {
+  async getPosts(client: client, data: getPostData) {
   }
 }
