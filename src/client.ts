@@ -1,3 +1,4 @@
+import { protectAuthenticators } from "./secure.ts";
 import { type rawUserData, user } from "./user.ts";
 
 export type loginResponseData = {
@@ -153,6 +154,7 @@ export class client {
       }
     }
 
+    // TODO: XSS
     const userData: user = new user(this, {
       rawUserData: responseData.account,
     });
@@ -337,7 +339,7 @@ export class client {
     }
 
     return {
-      result: authenticatorList,
+      result: protectAuthenticators(authenticatorList),
       error: false,
     };
   }
